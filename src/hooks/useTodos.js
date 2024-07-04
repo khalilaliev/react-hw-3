@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import service from "../services/mock-service-api";
-import { status, title } from "../constants/constants";
+import { STORAGE_KEY, status, title } from "../constants/constants";
 
 export const useTodos = () => {
   const [todos, setTodos] = useState([]);
@@ -8,13 +8,27 @@ export const useTodos = () => {
   const [todosProgress, setTodosProgress] = useState([]);
   const [todosDone, setTodosDone] = useState([]);
 
+  const saveTodosToLocalStorage = (todos) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+  };
+
+  const loadTodosFromLocalStorage = () => {
+    const storedTodos = localStorage.getItem(STORAGE_KEY);
+    if (storedTodos) setTodos(JSON.parse(storedTodos));
+  };
+
   const getTodos = async () => {
-    const res = await service.get();
-    setTodos(res);
+    try {
+      const res = await service.get();
+      setTodos(res);
+      saveTodosToLocalStorage(res);
+    } catch (e) {
+      console.error(e.message);
+    }
   };
 
   useEffect(() => {
-    getTodos();
+    loadTodosFromLocalStorage();
   }, []);
 
   useEffect(() => {
@@ -28,6 +42,9 @@ export const useTodos = () => {
   useEffect(() => {
     setTodosDone(todos.filter((item) => item.status === status.DONE));
   }, [todos]);
+  // useEffect(() => {
+  //   saveTodosToLocalStorage(todos);
+  // }, [todos]);
 
   const handleItemStatus = async (id, status) => {
     try {
@@ -50,6 +67,15 @@ export const useTodos = () => {
       await service.delete(id);
       getTodos();
       // setTodos((prevState) => prevState.filter((item) => item.id !== id));
+    } catch (e) {
+      console.error(e.message);
+    }
+  };
+
+  const handleCreateTodos = async (status) => {
+    try {
+      const res = await service.post(status);
+      setTodos((prevState) => [...prevState, res]);
     } catch (e) {
       console.error(e.message);
     }
@@ -99,7 +125,7 @@ export const useTodos = () => {
     },
   ];
 
-  return { todosBlock };
+  return { todosBlock, handleCreateTodos };
 };
 
 export default useTodos;

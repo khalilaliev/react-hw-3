@@ -11,4 +11,6 @@ const title = {
   ARCHIVE: "To archive",
 };
 
-export { status, title };
+const STORAGE_KEY = "todos";
+
+export { status, title, STORAGE_KEY };
