@@ -1,48 +1,52 @@
 import { useEffect, useState } from "react";
 import service from "../services/mock-service-api";
-import { STORAGE_KEY, status, title } from "../constants/constants";
+import { status, title } from "../constants/constants";
 
 export const useTodos = () => {
   const [todos, setTodos] = useState([]);
   const [todosTodo, setTodosTodo] = useState([]);
   const [todosProgress, setTodosProgress] = useState([]);
   const [todosDone, setTodosDone] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isSorted, setIsSorted] = useState({});
 
-  const saveTodosToLocalStorage = (todos) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-  };
+  // const saveTodosToLocalStorage = (todos) => {
+  //   return localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+  // };
 
-  const loadTodosFromLocalStorage = () => {
-    const storedTodos = localStorage.getItem(STORAGE_KEY);
-    return storedTodos ? JSON.parse(storedTodos) : [];
-  };
+  // const loadTodosFromLocalStorage = () => {
+  //   const storedTodos = localStorage.getItem(STORAGE_KEY);
+
+  //   return storedTodos ? JSON.parse(storedTodos) : undefined;
+  // };
 
   const getTodos = async () => {
     try {
       const res = await service.get();
       setTodos(res);
-      saveTodosToLocalStorage(res);
+      // saveTodosToLocalStorage(res);
     } catch (e) {
       console.error(e.message);
     }
   };
 
+  // useEffect(() => {
+  //   const localTodos = loadTodosFromLocalStorage();
+  //   console.log(localTodos);
+  //   if (localTodos.length) {
+  //     setTodos(localTodos);
+  //   } else {
+  //     getTodos();
+  //   }
+  // }, []);
   useEffect(() => {
-    const localTodos = loadTodosFromLocalStorage();
-    if (localTodos.length) {
-      setTodos(localTodos);
-      setLoading(false);
-    } else {
-      getTodos().finally(() => setLoading(false));
-    }
+    getTodos();
   }, []);
 
   useEffect(() => {
     setTodosTodo(todos.filter((item) => item.status === status.TODO));
     setTodosProgress(todos.filter((item) => item.status === status.PROGRESS));
     setTodosDone(todos.filter((item) => item.status === status.DONE));
-    saveTodosToLocalStorage(todos);
+    // saveTodosToLocalStorage(todos);
   }, [todos]);
 
   const handleItemStatus = async (id, newStatus) => {
@@ -76,6 +80,38 @@ export const useTodos = () => {
     }
   };
 
+  const handleSort = (status) => {
+    setIsSorted((prevState) => ({
+      ...prevState,
+      [status]: !prevState[status],
+    }));
+
+    switch (status) {
+      case title.TODO:
+        setTodosTodo((prevList) =>
+          [...prevList].sort((a, b) =>
+            isSorted[status] ? b.priority - a.priority : a.priority - b.priority
+          )
+        );
+        break;
+      case title.PROGRESS:
+        setTodosProgress((prevList) =>
+          [...prevList].sort((a, b) =>
+            isSorted[status] ? b.priority - a.priority : a.priority - b.priority
+          )
+        );
+        break;
+      case title.DONE:
+        setTodosDone((prevList) =>
+          [...prevList].sort((a, b) =>
+            isSorted[status] ? b.priority - a.priority : a.priority - b.priority
+          )
+        );
+        break;
+      default:
+        break;
+    }
+  };
   const todosBlock = [
     {
       title: title.TODO,
@@ -116,7 +152,7 @@ export const useTodos = () => {
     },
   ];
 
-  return { todosBlock, handleCreateTodo, loading };
+  return { todosBlock, handleCreateTodo, handleSort };
 };
 
 export default useTodos;

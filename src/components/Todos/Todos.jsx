@@ -3,18 +3,20 @@ import useTodos from "../../hooks/useTodos";
 import Form from "../Form/Form";
 
 const Todos = () => {
-  const { todosBlock, handleCreateTodos } = useTodos();
+  const { todosBlock, handleCreateTodo, handleSort } = useTodos();
+
   return (
     <>
       <div className="container max-w-fit">
         <div className=" flex gap-5 mt-10">
-          <Form addTodo={handleCreateTodos} />
+          <Form addTodo={handleCreateTodo} />
           {todosBlock.map((item, index) => (
             <TodoBox
               key={index}
               title={item.title}
               list={item.list}
               btns={item.btns}
+              handleSort={() => handleSort(item.title)}
             />
           ))}
         </div>
