@@ -8,36 +8,22 @@ export const useTodos = () => {
   const [todosProgress, setTodosProgress] = useState([]);
   const [todosDone, setTodosDone] = useState([]);
   const [isSorted, setIsSorted] = useState({});
+  const [priority, setPriority] = useState(false);
 
-  // const saveTodosToLocalStorage = (todos) => {
-  //   return localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-  // };
-
-  // const loadTodosFromLocalStorage = () => {
-  //   const storedTodos = localStorage.getItem(STORAGE_KEY);
-
-  //   return storedTodos ? JSON.parse(storedTodos) : undefined;
-  // };
+  const handleButtonClick = () => {
+    console.log("clicked");
+    setPriority((prevState) => !prevState);
+  };
 
   const getTodos = async () => {
     try {
       const res = await service.get();
       setTodos(res);
-      // saveTodosToLocalStorage(res);
     } catch (e) {
       console.error(e.message);
     }
   };
 
-  // useEffect(() => {
-  //   const localTodos = loadTodosFromLocalStorage();
-  //   console.log(localTodos);
-  //   if (localTodos.length) {
-  //     setTodos(localTodos);
-  //   } else {
-  //     getTodos();
-  //   }
-  // }, []);
   useEffect(() => {
     getTodos();
   }, []);
@@ -46,7 +32,6 @@ export const useTodos = () => {
     setTodosTodo(todos.filter((item) => item.status === status.TODO));
     setTodosProgress(todos.filter((item) => item.status === status.PROGRESS));
     setTodosDone(todos.filter((item) => item.status === status.DONE));
-    // saveTodosToLocalStorage(todos);
   }, [todos]);
 
   const handleItemStatus = async (id, newStatus) => {
@@ -112,6 +97,7 @@ export const useTodos = () => {
         break;
     }
   };
+
   const todosBlock = [
     {
       title: title.TODO,
@@ -152,7 +138,14 @@ export const useTodos = () => {
     },
   ];
 
-  return { todosBlock, handleCreateTodo, handleSort };
+  return {
+    todosBlock,
+    handleCreateTodo,
+    handleSort,
+    isSorted,
+    handleButtonClick,
+    priority,
+  };
 };
 
 export default useTodos;

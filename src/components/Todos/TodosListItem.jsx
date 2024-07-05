@@ -1,18 +1,21 @@
 import "./style.css";
 import Button from "../Button/Button";
 
-const TodosListItem = ({ list = [], btns = [] }) => {
+const TodosListItem = ({ list = [], btns = [], priority }) => {
   return (
     <ul>
       {list.map((item, index) => (
         <li
           key={item.id}
-          className=" flex justify-between items-center" //* className={item.priority ? "priority" : ""}
+          // className={item.priority ? "priority" : ""}
+          className={`flex justify-between items-center ${
+            priority && !item.priority ? "priority" : ""
+          }`}
         >
-          {index + 1}: {item.title}{" "}
-          {btns.map((btn, index) => (
+          {index + 1}. {item.title}{" "}
+          {btns.map((btn) => (
             <Button
-              key={index}
+              key={item.id + btn.title}
               handleClick={() => btn.handleClick(item.id, btn.status)}
               title={btn.title}
             />
