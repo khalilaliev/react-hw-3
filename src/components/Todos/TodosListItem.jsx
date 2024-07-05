@@ -9,7 +9,7 @@ const TodosListItem = ({ list = [], btns = [], priority }) => {
           key={item.id}
           // className={item.priority ? "priority" : ""}
           className={`flex justify-between items-center ${
-            priority && !item.priority ? "priority" : ""
+            priority && item.priority ? "priority" : ""
           }`}
         >
           {index + 1}. {item.title}{" "}
